@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Algorihtm,LeetCode,Java,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Jayce's Blog" type="application/atom+xml">
+
+
+
+
+
+
+<meta name="description" content="Leetcode 新出了多线程的题库，底下评论各路大神秀操作，不过接下来我们试一下怎么用信号量来解决这四个问题。">
+<meta name="keywords" content="Algorihtm,LeetCode,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode-多线程题库一锅端！">
+<meta property="og:url" content="http://jayceatstar.club/2019/07/19/Leetcode-thread/index.html">
+<meta property="og:site_name" content="Jayce&#39;s Blog">
+<meta property="og:description" content="Leetcode 新出了多线程的题库，底下评论各路大神秀操作，不过接下来我们试一下怎么用信号量来解决这四个问题。">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://jayceatstar.club/2019/07/19/Leetcode-thread/head.png">
+<meta property="og:updated_time" content="2019-08-01T03:40:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LeetCode-多线程题库一锅端！">
+<meta name="twitter:description" content="Leetcode 新出了多线程的题库，底下评论各路大神秀操作，不过接下来我们试一下怎么用信号量来解决这四个问题。">
+<meta name="twitter:image" content="http://jayceatstar.club/2019/07/19/Leetcode-thread/head.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Jayce'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://jayceatstar.club/2019/07/19/Leetcode-thread/">
+
+
+
+
+
+  <title>LeetCode-多线程题库一锅端！ | Jayce's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jayce's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Code & Music</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://jayceatstar.club/2019/07/19/Leetcode-thread/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jayce">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jayce's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LeetCode-多线程题库一锅端！</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-07-19T00:00:00+08:00">
+                2019-07-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/categories/Algorihtm/" itemprop="url" rel="index">
+                    <span itemprop="name">Algorihtm</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <img src="/2019/07/19/Leetcode-thread/head.png">
+<blockquote>
+<p>Leetcode 新出了多线程的题库，底下评论各路大神秀操作，不过接下来我们试一下怎么用信号量来解决这四个问题。</p>
+</blockquote>
+<a id="more"></a>
+<h2 id="1114-按序打印-简单"><a href="#1114-按序打印-简单" class="headerlink" title="1114 按序打印 简单"></a><a href="https://leetcode-cn.com/problems/print-in-order/" target="_blank" rel="noopener"><code>1114</code></a> 按序打印 <code>简单</code></h2><h3 id="描述"><a href="#描述" class="headerlink" title="描述"></a>描述</h3><p>我们提供了一个类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">one</span><span class="params">()</span> </span>&#123; print(<span class="string">"one"</span>); &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">two</span><span class="params">()</span> </span>&#123; print(<span class="string">"two"</span>); &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">three</span><span class="params">()</span> </span>&#123; print(<span class="string">"three"</span>); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>三个不同的线程将会共用一个<code>Foo</code>实例。</p>
+<ul>
+<li>线程<code>A</code>将会调用<code>one()</code>方法</li>
+<li>线程<code>B</code>将会调用<code>two()</code>方法</li>
+<li>线程<code>C</code>将会调用<code>three()</code>方法</li>
+</ul>
+<p>请设计修改程序，以确保<code>two()</code>方法在<code>one()</code>方法之后被执行，<code>three()</code> 方法在 <code>two()</code> 方法之后被执行。</p>
+<h3 id="示例1"><a href="#示例1" class="headerlink" title="示例1"></a>示例1</h3><p>输入: [1,2,3]<br>输出: “onetwothree”<br>解释:<br>有三个线程会被异步启动。<br>输入 [1,2,3] 表示线程 A 将会调用 one() 方法，线程 B 将会调用 two() 方法，线程 C 将会调用 three() 方法。<br>正确的输出是 “onetwothree”</p>
+<h3 id="示例2"><a href="#示例2" class="headerlink" title="示例2"></a>示例2</h3><p>输入: [1,3,2]<br>输出: “onetwothree”<br>解释:<br>输入 [1,3,2] 表示线程 A 将会调用 one() 方法，线程 B 将会调用 three() 方法，线程 C 将会调用 two() 方法。<br>正确的输出是 “onetwothree”</p>
+<h3 id="解答"><a href="#解答" class="headerlink" title="解答"></a>解答</h3><p>这个是一个典型的制造屏障的问题，可以通过lock，CountDownLatch等多种方法解决，我们用信号量的方法解决，按顺序输出。没什么需要特别说的，Show you the code. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.Semaphore;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Foo</span> </span>&#123;</span><br><span class="line">    Semaphore s2, s3;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        s2 = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">        s3 = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">first</span><span class="params">(Runnable printFirst)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// printFirst.run() outputs "first". Do not change or remove this line.</span></span><br><span class="line">        printFirst.run();</span><br><span class="line">        s2.release();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">second</span><span class="params">(Runnable printSecond)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        s2.acquire();</span><br><span class="line">        <span class="comment">// printSecond.run() outputs "second". Do not change or remove this line.</span></span><br><span class="line">        printSecond.run();</span><br><span class="line">        s3.release();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">third</span><span class="params">(Runnable printThird)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        s3.acquire();</span><br><span class="line">        <span class="comment">// printThird.run() outputs "third". Do not change or remove this line.</span></span><br><span class="line">        printThird.run();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1115-交替打印FooBar-中等"><a href="#1115-交替打印FooBar-中等" class="headerlink" title="1115 交替打印FooBar 中等"></a><a href="https://leetcode-cn.com/problems/print-foobar-alternately/" target="_blank" rel="noopener"><code>1115</code></a> 交替打印FooBar <code>中等</code></h2><h3 id="描述-1"><a href="#描述-1" class="headerlink" title="描述"></a>描述</h3><p>我们提供了一个类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FooBar</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">      print(<span class="string">"foo"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bar</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">      print(<span class="string">"bar"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>两个不同的线程将会共用一个 <code>FooBar</code> 实例。其中一个线程将会调用 <code>foo()</code> 方法，另一个线程将会调用 <code>bar()</code> 方法。</p>
+<p>请设计修改程序，以确保 “foobar” 被输出 n 次。</p>
+<h3 id="示例1-1"><a href="#示例1-1" class="headerlink" title="示例1"></a>示例1</h3><p>输入: n = 1<br>输出: “foobar”<br>解释: 这里有两个线程被异步启动。其中一个调用 foo() 方法, 另一个调用 bar() 方法，”foobar” 将被输出一次。</p>
+<h3 id="示例2-1"><a href="#示例2-1" class="headerlink" title="示例2"></a>示例2</h3><p>输入: n = 2<br>输出: “foobarfoobar”<br>解释: “foobar” 将被输出两次。</p>
+<h3 id="解答-1"><a href="#解答-1" class="headerlink" title="解答"></a>解答</h3><p>这道题看起来比第一道稍复杂一点，但其实都差不多，也是一个线程在另一个线程之后调度，用信号量的话，两个线程相互唤醒就可以了，Show you the code. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.Semaphore;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FooBar</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> n;</span><br><span class="line">    Semaphore s1,s2;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">FooBar</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.n = n;</span><br><span class="line">        s1 = <span class="keyword">new</span> Semaphore(<span class="number">1</span>);</span><br><span class="line">        s2 = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">foo</span><span class="params">(Runnable printFoo)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            s1.acquire();</span><br><span class="line">        	<span class="comment">// printFoo.run() outputs "foo". Do not change or remove this line.</span></span><br><span class="line">        	printFoo.run();</span><br><span class="line">            s2.release();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bar</span><span class="params">(Runnable printBar)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            s2.acquire();</span><br><span class="line">            <span class="comment">// printBar.run() outputs "bar". Do not change or remove this line.</span></span><br><span class="line">        	printBar.run();</span><br><span class="line">            s1.release();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1116-打印零与奇偶数-中等"><a href="#1116-打印零与奇偶数-中等" class="headerlink" title="1116 打印零与奇偶数 中等"></a><a href="https://leetcode-cn.com/problems/print-zero-even-odd/" target="_blank" rel="noopener"><code>1116</code></a> 打印零与奇偶数 <code>中等</code></h2><h3 id="描述-2"><a href="#描述-2" class="headerlink" title="描述"></a>描述</h3><p>假设有这么一个类:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ZeroEvenOdd</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ZeroEvenOdd</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123; ... &#125;      <span class="comment">// 构造函数</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">zero</span><span class="params">(printNumber)</span> </span>&#123; ... &#125;  <span class="comment">// 仅打印出 0</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">even</span><span class="params">(printNumber)</span> </span>&#123; ... &#125;  <span class="comment">// 仅打印出 偶数</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">odd</span><span class="params">(printNumber)</span> </span>&#123; ... &#125;   <span class="comment">// 仅打印出 奇数</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>相同的一个<code>ZeroEvenOdd</code>类实例将会传递给三个不同的线程：</p>
+<ul>
+<li>线程<code>A</code>将调用<code>zero()</code>，它只输出 0 。</li>
+<li>线程<code>B</code>将调用<code>even()</code>，它只输出偶数。</li>
+<li>线程<code>C</code>将调用<code>odd()</code>，它只输出奇数。</li>
+</ul>
+<p>每个线程都有一个<code>printNumber</code>方法来输出一个整数。请修改给出的代码以输出整数序列 <code>010203040506...</code> ，其中序列的长度必须为<code>2n</code>。</p>
+<h3 id="示例1-2"><a href="#示例1-2" class="headerlink" title="示例1"></a>示例1</h3><p>输入: n = 2<br>输出: “0102”<br>解释: 三条线程异步执行，其中一个调用 zero()，另一个线程调用 even()，最后一个线程调用odd()。正确的输出为 “0102”。</p>
+<h3 id="示例2-2"><a href="#示例2-2" class="headerlink" title="示例2"></a>示例2</h3><p>输入: n = 5<br>输出: “0102030405”</p>
+<h3 id="解答-2"><a href="#解答-2" class="headerlink" title="解答"></a>解答</h3><p>我们分析一下这三个线程的输出顺序，先是0，再分别是奇数和偶数，那就是在输出0的线程后根据当前的奇偶情况唤醒对应的奇偶线程，然后对应的奇偶线程再唤醒0。Show you the code. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.Semaphore;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ZeroEvenOdd</span> </span>&#123;</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">int</span> n;</span><br><span class="line">  Semaphore s1, s2, s3, s4;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ZeroEvenOdd</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.n = n;</span><br><span class="line">    s1 = <span class="keyword">new</span> Semaphore(<span class="number">1</span>);</span><br><span class="line">    s2 = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">    s3 = <span class="keyword">new</span> Semaphore(<span class="number">0</span>);</span><br><span class="line">    s4 = <span class="keyword">new</span> Semaphore(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// printNumber.accept(x) outputs "x", where x is an integer.</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">zero</span><span class="params">(IntConsumer printNumber)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">   <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">      s4.acquire();</span><br><span class="line">      s1.acquire();</span><br><span class="line">      printNumber.accept(<span class="number">0</span>);</span><br><span class="line">      <span class="keyword">if</span> ((i &amp; <span class="number">1</span>) == <span class="number">0</span>) &#123;</span><br><span class="line">        s2.release();</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        s3.release();</span><br><span class="line">      &#125;</span><br><span class="line">      s1.release();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">even</span><span class="params">(IntConsumer printNumber)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt;= n ; i+=<span class="number">2</span>) &#123;</span><br><span class="line">      s2.acquire();</span><br><span class="line">      printNumber.accept(i);</span><br><span class="line">      s4.release();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">odd</span><span class="params">(IntConsumer printNumber)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n ; i+=<span class="number">2</span>) &#123;</span><br><span class="line">      s3.acquire();</span><br><span class="line">      printNumber.accept(i);</span><br><span class="line">      s4.release();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="1117-H2O-生成-困难"><a href="#1117-H2O-生成-困难" class="headerlink" title="1117  H2O 生成 困难"></a><a href="https://leetcode-cn.com/problems/building-h2o/" target="_blank" rel="noopener"><code>1117</code></a>  H2O 生成 <code>困难</code></h2><h3 id="描述-3"><a href="#描述-3" class="headerlink" title="描述"></a>描述</h3><p>现在有两种线程，氢<code>oxygen</code>和氧<code>hydrogen</code>，你的目标是组织这两种线程来产生水分子。</p>
+<p>存在一个屏障（barrier）使得每个线程必须等候直到一个完整水分子能够被产生出来。</p>
+<p>氢和氧线程会被分别给予<code>releaseHydrogen</code>和<code>releaseOxygen</code>方法来允许它们突破屏障。</p>
+<p>这些线程应该三三成组突破屏障并能立即组合产生一个水分子。</p>
+<p>你必须保证产生一个水分子所需线程的结合必须发生在下一个水分子产生之前。</p>
+<p>换句话说:</p>
+<ul>
+<li>如果一个氧线程到达屏障时没有氢线程到达，它必须等候直到两个氢线程到达。</li>
+<li>如果一个氢线程到达屏障时没有其它线程到达，它必须等候直到一个氧线程和另一个氢线程到达。</li>
+</ul>
+<p>书写满足这些限制条件的氢、氧线程同步代码。</p>
+<h3 id="示例1-3"><a href="#示例1-3" class="headerlink" title="示例1"></a>示例1</h3><p>输入: “HOH”<br>输出: “HHO”<br>解释: “HOH” 和 “OHH” 依然都是有效解。</p>
+<h3 id="示例2-3"><a href="#示例2-3" class="headerlink" title="示例2"></a>示例2</h3><p>输入: “OOHHHH”<br>输出: “HHOHHO”<br>解释: “HOHHHO”, “OHHHHO”, “HHOHOH”, “HOHHOH”, “OHHHOH”, “HHOOHH”, “HOHOHH” 和 “OHHOHH” 依然都是有效解。</p>
+<h3 id="解答-3"><a href="#解答-3" class="headerlink" title="解答"></a>解答</h3><p>这个解法是看到底下评论的大神的解法，也是看了这个解法我才把这四道题都用信号量做了一遍。注释写的很清楚，当确保两个H线程和一个O线程都到的时候再输出，Show you the code. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">H2O</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> Semaphore s1,s2,s3,s4;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">H2O</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        s1 = <span class="keyword">new</span> Semaphore(<span class="number">2</span>); <span class="comment">// H线程信号量</span></span><br><span class="line">        s2 = <span class="keyword">new</span> Semaphore(<span class="number">1</span>); <span class="comment">// O线程信号量</span></span><br><span class="line">        </span><br><span class="line">        s3 = <span class="keyword">new</span> Semaphore(<span class="number">0</span>); <span class="comment">// 反应条件信号量</span></span><br><span class="line">        s4 = <span class="keyword">new</span> Semaphore(<span class="number">0</span>); <span class="comment">// 反应条件信号量</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hydrogen</span><span class="params">(Runnable releaseHydrogen)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        s1.acquire(); <span class="comment">// 保证只有2个H线程进入执行</span></span><br><span class="line">        s3.release(); <span class="comment">// 释放H原子到达信号</span></span><br><span class="line">        s4.acquire(); <span class="comment">// 等待O原子到达</span></span><br><span class="line">        releaseHydrogen.run();</span><br><span class="line">        s1.release(); <span class="comment">// 相当于唤醒1个H线程</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">oxygen</span><span class="params">(Runnable releaseOxygen)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        s2.acquire(); <span class="comment">// 保证只有1个O线程进入执行</span></span><br><span class="line">        s4.release(<span class="number">2</span>); <span class="comment">// 释放O原子到达信号，因为有2个H线程等待所以释放2个</span></span><br><span class="line">        s3.acquire(<span class="number">2</span>); <span class="comment">// 等待H原子到达，2个原因同上</span></span><br><span class="line">        releaseOxygen.run();</span><br><span class="line">        s2.release(); <span class="comment">// 相当于唤醒1个O线程</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Algorihtm/" rel="tag"># Algorihtm</a>
+          
+            <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/25/NQueens/" rel="next" title="LeetCode-N-Queens">
+                <i class="fa fa-chevron-left"></i> LeetCode-N-Queens
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/31/ConcurrentHashmap/" rel="prev" title="ConcurrentHashmap(1.8版本)">
+                ConcurrentHashmap(1.8版本) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jayce</p>
+              <p class="site-description motion-element" itemprop="description">热爱生活，热爱音乐</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">categories</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1114-按序打印-简单"><span class="nav-number">1.</span> <span class="nav-text">1114 按序打印 简单</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#描述"><span class="nav-number">1.1.</span> <span class="nav-text">描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1"><span class="nav-number">1.2.</span> <span class="nav-text">示例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2"><span class="nav-number">1.3.</span> <span class="nav-text">示例2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解答"><span class="nav-number">1.4.</span> <span class="nav-text">解答</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1115-交替打印FooBar-中等"><span class="nav-number">2.</span> <span class="nav-text">1115 交替打印FooBar 中等</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#描述-1"><span class="nav-number">2.1.</span> <span class="nav-text">描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1-1"><span class="nav-number">2.2.</span> <span class="nav-text">示例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2-1"><span class="nav-number">2.3.</span> <span class="nav-text">示例2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解答-1"><span class="nav-number">2.4.</span> <span class="nav-text">解答</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1116-打印零与奇偶数-中等"><span class="nav-number">3.</span> <span class="nav-text">1116 打印零与奇偶数 中等</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#描述-2"><span class="nav-number">3.1.</span> <span class="nav-text">描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1-2"><span class="nav-number">3.2.</span> <span class="nav-text">示例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2-2"><span class="nav-number">3.3.</span> <span class="nav-text">示例2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解答-2"><span class="nav-number">3.4.</span> <span class="nav-text">解答</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1117-H2O-生成-困难"><span class="nav-number">4.</span> <span class="nav-text">1117  H2O 生成 困难</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#描述-3"><span class="nav-number">4.1.</span> <span class="nav-text">描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例1-3"><span class="nav-number">4.2.</span> <span class="nav-text">示例1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例2-3"><span class="nav-number">4.3.</span> <span class="nav-text">示例2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解答-3"><span class="nav-number">4.4.</span> <span class="nav-text">解答</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jayce</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
